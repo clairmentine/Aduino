@@ -2,6 +2,7 @@
 Goal: a safe with a burglarproof system 
 it can do.. 
 1. password lock
+
 2. when the safe is opened using force, 
 the light would come in.
 the safe will detect the light (illuminance sensor)
