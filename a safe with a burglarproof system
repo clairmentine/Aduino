@@ -1,0 +1,196 @@
+/*
+Goal: a safe with a burglarproof system 
+it can do.. 
+1. password lock
+2. when the safe is opened using force, 
+the light would come in.
+the safe will detect the light (illuminance sensor)
+and activate the BPS* 
+(the definition of the BPS is described at the below part)
+
+3. in the same condition with 2, 
+if the valuables are relocated and be taken, 
+the safe would detect the relocation of the valuables and (ultrasonic sensor)
+it would activate the BPS.
+
+*burglarproof system (= BPS)
+- red LED light would light up (LED)
+- make loud (piezo speaker)
+
+plus, 
+when the password is correct, 
+the blue LED would light up and open the safe automatically. (survo motor)
+if not, the red LED would light up.
+
+worked with
+MOON JI HOON: hardware part
+PARK SOO MIN: coding part: part of button, survo motor, Piezo speaker, LED
+JIYEON SEO (ME): coding part: part of button, illuminance sensor, ultrasonic sensor 
+*/
+
+//ultrasonic sensor 
+#define trig 9
+#define echo 10
+#define objDistance= 15; //location of the valuables 
+
+//servo motor
+#define motor 11
+
+//piezo speaker
+#define speaker 12
+
+//illuminance sensor
+#define ilu A2
+
+//LED
+#define greenLed A0
+#define redLed A2
+#define ledR 9
+#define ledB 8
+
+//buttons
+#define button1 2
+#define button2 3
+#define button3 4
+#define button4 5
+
+#define bNum 4 //number of the buttons 
+#define pNum 4 //number of the password
+#define inNum 4 //number of the input values
+
+int bArr[bNum]= {button1, button2, button3, button4};
+
+//password 
+int passWord[pNum]={0, };
+
+//input value
+int inputNum[inNum]= {0, };
+
+int i=0, k=0;
+
+void setup() {
+    //ultrasonic sensor 
+    pinMode(trig, OUTPUT);
+    pinMode(echo, INPUT);
+
+    //button
+    for (int i = 0, i<bNum, i++) {
+        pinMode(bArr[i], INPUT);
+    }
+}
+
+void loop() {
+    /*ultrasonic sensor*/
+    digitalWrite(trig, 0); //clear trig
+    delayMicroseconds(10);
+
+    long duration= pulseIn(echo, 1); 
+    long distance= duration/ 58.2; 
+
+    /*button*/
+    //check if the input number and password matches
+    int pwMatch;
+
+    for(int i=0; i<pNum; i++){
+        if(passWord[i] == inputNum[i]) pwMatch= 1;
+        else {
+            pwMatch= 0;
+            break;
+        }
+    }
+    
+     /*set password*/
+  if (digitalRead(button1) == 1){ //if '1' is pressed, you can start setting the password
+    delay(1000);
+    for ( int i =0;i<4;) {
+      if (digitalRead(button1) == 1){
+         passWord[i] = 1;
+         i += 1;
+         delay(1000);
+      } 
+      if (digitalRead(button2)==1){
+        passWord[i] = 2;
+        i += 1;
+        delay(1000);
+      }
+      if (digitalRead(button3) == 1){
+        passWord[i] = 3;
+        i += 1;
+        delay(1000);
+      }
+      if(digitalRead(button4)==1){
+        passWord[i] =4;
+        i += 1;
+        delay(1000);
+      }
+    }
+    digitalWrite(ledB,1);
+    delay(100);
+    digitalWrite(ledB,0);
+  }
+
+  /*enter password*/
+  if (digitalRead(button2)==1){ //if '2' is pressed, you can start entering the input value
+    delay(1000);
+    for (int k =0;k<4;){
+      if (digitalRead(button1) == 1){
+         inputNum[k] = 1;
+         k += 1;
+         delay(1000);
+      } 
+      if (digitalRead(button2)==1){
+        inputNum[k] = 2;
+        k += 1;
+        delay(1000);
+      }
+      if (digitalRead(button3) == 1){
+        inputNum[k] = 3;
+        k += 1;
+        delay(1000);
+      }
+      if(digitalRead(button4)==1){
+        inputNum[k] =4;
+        k += 1;
+        delay(1000);
+      }
+    }
+  }
+  
+  
+  /*Compare input values and password*/
+  
+    //when the input value and the password matches 
+    if(pwMatch== 1){
+        //open the safe with servo motor
+        servo1.write(90);
+    }
+
+    //when the input value doesn't match password + light comes in (illuminance sensor)
+    else if(pwMatch== 0 && analogRead(ilu)> 300){
+        //activate BPS 
+        servo1.write(90);
+        digitalWrite(ledR,1);
+        delay(100);
+        digitalWrite(ledR,0);
+    }
+    //when the input value doesn't match password + valuables are getting relocated and be taken (ultrasonic sensor)
+    else if(pwMatch== 0 && distance> objDistance){
+        //activate BPS 
+        servo1.write(90);
+        digitalWrite(ledR,1);
+        delay(100);
+        digitalWrite(ledR,0);
+    }
+
+    //when the input value doesn't match password
+    else if(pwMatch== 0){
+        {
+          //activate BPS 
+          servo1.write(90);
+          digitalWrite(ledR,1);
+          delay(100);
+          digitalWrite(ledR,0);
+        }
+    }
+
+}
