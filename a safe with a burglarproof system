@@ -86,18 +86,6 @@ void loop() {
 
     long duration= pulseIn(echo, 1); 
     long distance= duration/ 58.2; 
-
-    /*button*/
-    //check if the input number and password matches
-    int pwMatch;
-
-    for(int i=0; i<pNum; i++){
-        if(passWord[i] == inputNum[i]) pwMatch= 1;
-        else {
-            pwMatch= 0;
-            break;
-        }
-    }
     
      /*set password*/
   if (digitalRead(button1) == 1){ //if '1' is pressed, you can start setting the password
@@ -156,8 +144,17 @@ void loop() {
     }
   }
   
-  
   /*Compare input values and password*/
+  
+  int pwMatch;
+
+    for(int i=0; i<pNum; i++){
+        if(passWord[i] == inputNum[i]) pwMatch= 1;
+        else {
+            pwMatch= 0;
+            break;
+        }
+    }
   
     //when the input value and the password matches 
     if(pwMatch== 1){
